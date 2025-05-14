@@ -6,6 +6,9 @@
 package org.example;
 
 import java.util.Arrays;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 
 import org.encog.engine.network.activation.ActivationLinear;
 import org.encog.engine.network.activation.ActivationTANH;
@@ -21,6 +24,7 @@ import org.encog.neural.networks.training.Train;
 import org.encog.util.arrayutil.NormalizationAction;
 import org.encog.util.arrayutil.NormalizedField;
 import org.encog.util.simple.EncogUtility;
+import org.encog.persist.EncogDirectoryPersistence;
 
 /*
 1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26
@@ -29,7 +33,7 @@ import org.encog.util.simple.EncogUtility;
 
 public class App {
 	private static int epoches = 1_000;
-	
+
 	// Sample time series data (e.g., previous 3 values to predict the next value)
 	private static double[][] rawInput = {
 		{11,12,14,15,16,17,18,18,19,19,20,20,20,20,20,19,19,18,17,16},
@@ -76,7 +80,7 @@ public class App {
 		MLData inputData = new BasicMLData(testInput);
 		MLData outputData = network.compute(inputData);
 
-		System.out.println("Prediction for input "+ Arrays.toString(testInput) +": " + outputData.getData(0));
+		//System.out.println("Prediction for input "+ Arrays.toString(testInput) +": " + outputData.getData(0));
 	}
 
 	public static void main2(String[] args) {
@@ -111,7 +115,7 @@ public class App {
 
 		// Define the neural network
 		BasicNetwork network = new BasicNetwork();
-		network.addLayer(new BasicLayer(null, true, 20));  // Input layer with 3 neurons
+		network.addLayer(new BasicLayer(new ActivationLinear(), true, 20));  // Input layer with 20 neurons
 		network.addLayer(new BasicLayer(new ActivationTANH(), true, 15)); // Hidden layer with TANH activation
 		network.addLayer(new BasicLayer(new ActivationTANH(), false, 1));  // Output layer (Linear activation)
 		network.getStructure().finalizeStructure();
@@ -143,10 +147,16 @@ public class App {
 		double predictedValue = outputNormalizer.deNormalize(predictedNormalized);
 
 		System.out.println("Prediction for input "+ Arrays.toString(testInput) +": " + predictedValue);
+
+		/*
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		EncogDirectoryPersistence.saveObject(baos, network);
+		System.err.println(baos.toString());
+		/**/
 	}
 
 	public static void main(String[] args) {
-		main1(args);
+		//main1(args);
 		main2(args);
 	}
 }
